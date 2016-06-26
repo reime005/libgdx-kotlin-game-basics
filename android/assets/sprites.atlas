@@ -1,0 +1,48 @@
+
+sprites.png
+size: 2048,1024
+format: RGBA8888
+filter: MipMapLinearNearest,Linear
+repeat: none
+background
+  rotate: false
+  xy: 2, 516
+  size: 800, 480
+  orig: 800, 480
+  offset: 0, 0
+  index: -1
+button_again
+  rotate: false
+  xy: 2, 2
+  size: 512, 512
+  orig: 512, 512
+  offset: 0, 0
+  index: -1
+button_pause
+  rotate: false
+  xy: 804, 499
+  size: 496, 497
+  orig: 496, 497
+  offset: 0, 0
+  index: -1
+button_play
+  rotate: false
+  xy: 516, 334
+  size: 180, 180
+  orig: 180, 180
+  offset: 0, 0
+  index: -1
+button_quit
+  rotate: false
+  xy: 1800, 858
+  size: 138, 138
+  orig: 138, 138
+  offset: 0, 0
+  index: -1
+button_resume
+  rotate: false
+  xy: 1302, 499
+  size: 496, 497
+  orig: 496, 497
+  offset: 0, 0
+  index: -1
