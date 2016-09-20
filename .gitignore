@@ -20,12 +20,18 @@ android/gen/
 out/
 com_crashlytics_export_strings.xml
 
-## Gradle
+## Project specific
+core/build/
+android/google-services.json
+android/build/
+android/*.jks
 
-.gradle
+## Gradle
 gradle-app.setting
 build/
-build*
+.gradle/
+local.properties
+
 
 ## OS Specific
 .DS_Store
