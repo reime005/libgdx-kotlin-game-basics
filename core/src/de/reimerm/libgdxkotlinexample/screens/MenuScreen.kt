@@ -14,24 +14,26 @@
  * limitations under the License.
  */
 
-package de.reimerm.libgdxkotlinexample.menu
+package de.reimerm.libgdxkotlinexample.screens
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.g2d.Batch
-import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
 import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.ui.Button
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
 import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
+import de.reimerm.libgdxkotlinexample.abstract.AbstractStage
+import de.reimerm.libgdxkotlinexample.abstract.AbstractStretchStage
+import de.reimerm.libgdxkotlinexample.actors.BackgroundActor
 import de.reimerm.libgdxkotlinexample.enums.GameState
 import de.reimerm.libgdxkotlinexample.main.MainGame
-import de.reimerm.libgdxkotlinexample.main.MainScreen
 import de.reimerm.libgdxkotlinexample.utils.AssetsManager
 import de.reimerm.libgdxkotlinexample.utils.GameManager
 import de.reimerm.libgdxkotlinexample.utils.GameSettings
@@ -44,17 +46,19 @@ import de.reimerm.libgdxkotlinexample.utils.Resources
  */
 class MenuScreen : Screen {
 
-    private lateinit var stage: MenuStage
+    private var stage: Stage
+    private var stretchStage: Stage
+    private var exitButton: Button
 
     constructor() {
-        stage = MenuStage()
+        stage = MenuScreenStage()
+        stretchStage = MenuScreenStretchStage()
         Gdx.input.inputProcessor = stage
-        stage.init(AssetsManager.textureMap[Resources.RegionNames.BACKGROUND_NAME.name])
 
         val table: Table = Table()
         stage.addActor(table)
         table.setFillParent(true)
-        table.pad(Gdx.graphics.height.toFloat() * 0.025f)
+        table.pad(GameSettings.HEIGHT * 0.025f)
 
         val styleExitButton = ImageButton.ImageButtonStyle()
         val drawExitButton: Drawable = Image(AssetsManager.textureMap[Resources.RegionNames.BUTTON_QUIT_NAME.name]).drawable
@@ -66,12 +70,11 @@ class MenuScreen : Screen {
 
 //        table.debug()
 
-        val exitButton: ImageButton = ImageButton(styleExitButton)
-        exitButton.addListener(object : InputListener() {
-            override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
+        exitButton = ImageButton(styleExitButton)
+        exitButton.addListener(object : ClickListener() {
+            override fun clicked(event: InputEvent?, x: Float, y: Float) {
                 AssetsManager.dispose()
                 System.exit(0)
-                return false
             }
         })
 
@@ -84,31 +87,36 @@ class MenuScreen : Screen {
             }
         })
 
-        table.add(playButton).expand().center().bottom().right().size(Gdx.graphics.width * 0.15f, Gdx.graphics.width * 0.15f)
-        table.add(exitButton).expand().top().right().size(Gdx.graphics.width * 0.08f, Gdx.graphics.width * 0.08f)
+        table.add(playButton).expand().center().bottom().right().size(GameSettings.WIDTH * 0.15f, GameSettings.WIDTH * 0.15f)
+        table.add(exitButton).expand().top().right().size(GameSettings.WIDTH * 0.08f, GameSettings.WIDTH * 0.08f)
         GameManager.listener?.logout()
     }
 
     override fun show() {
-        GameSettings.gameState = GameState.RUNNING
+        GameManager.gameState = GameState.RUNNING
     }
 
     override fun pause() {
-        GameSettings.gameState = GameState.PAUSED
+        GameManager.gameState = GameState.PAUSED
     }
 
     override fun resize(width: Int, height: Int) {
-        stage.viewport.update(width, height, true);
+        stage.viewport.update(width, height, true)
+        stretchStage.viewport.update(width, height, true)
     }
 
     override fun hide() {
     }
 
     override fun render(delta: Float) {
-        Gdx.gl.glClearColor(1f, 1f, 1f, 1f);
+        Gdx.gl.glClearColor(1f, 1f, 1f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
         // Start the render process
+        stretchStage.viewport.apply()
+        stretchStage.draw()
+
+        stage.viewport.apply()
         stage.draw()
         stage.act(delta)
     }
@@ -118,27 +126,25 @@ class MenuScreen : Screen {
 
     override fun dispose() {
         stage.dispose()
+        stretchStage.dispose()
     }
 
-    private inner class MenuStage : Stage() {
+    private inner class MenuScreenStage : AbstractStage() {
 
-        val actor: BackgroundActor = BackgroundActor()
-
-        fun init(texture: TextureRegion?) {
-            actor.backgroundTexture = texture
-            addActor(actor)
-        }
-
-        private inner class BackgroundActor : Actor() {
-            var backgroundTexture: TextureRegion? = null
-
-            override fun draw(batch: Batch?, parentAlpha: Float) {
-                super.draw(batch, parentAlpha)
-
-                if (backgroundTexture != null) {
-                    batch?.draw(backgroundTexture, 0f, 0f, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
+        override fun keyDown(keyCode: Int): Boolean {
+            when (keyCode) {
+                Input.Keys.BACK -> {
+                    exitButton.toggle()
                 }
             }
+            return super.keyDown(keyCode)
+        }
+    }
+
+    private inner class MenuScreenStretchStage : AbstractStretchStage {
+
+        constructor() : super() {
+            addActor(BackgroundActor(AssetsManager.textureMap[Resources.RegionNames.BACKGROUND_NAME.name]))
         }
     }
 }

@@ -14,58 +14,73 @@
  * limitations under the License.
  */
 
-package de.reimerm.libgdxkotlinexample.main
+package de.reimerm.libgdxkotlinexample.screens
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.scenes.scene2d.Stage
-import de.reimerm.libgdxkotlinexample.menu.MenuScreen
-import de.reimerm.libgdxkotlinexample.utils.GameSettings
+import de.reimerm.libgdxkotlinexample.abstract.AbstractStretchStage
+import de.reimerm.libgdxkotlinexample.actors.BackgroundActor
+import de.reimerm.libgdxkotlinexample.main.MainStage
+import de.reimerm.libgdxkotlinexample.utils.AssetsManager
+import de.reimerm.libgdxkotlinexample.utils.GameManager
+import de.reimerm.libgdxkotlinexample.utils.Resources
 
 /**
- * Screen that is shown once when the app is starting and loading assets.
+ * Screen for the main game.
  *
- * Created by Marius Reimer on 18-Jun-16.
+ * Created by Marius Reimer on 10-Jun-16.
  */
-class SplashScreen : Screen {
+class MainScreen : Screen {
 
     private lateinit var stage: Stage
-    private var time = 0f
+    private lateinit var stretchStage: Stage
 
     constructor() {
-        stage = Stage()
+        stage = MainStage()
+        stretchStage = MainStretchStage()
     }
 
     override fun show() {
     }
 
     override fun pause() {
+        GameManager.onPause()
     }
 
     override fun resize(width: Int, height: Int) {
+        stage.viewport.update(width, height, true)
     }
 
     override fun hide() {
     }
 
     override fun render(delta: Float) {
-        Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
+        Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
         // Start the render process
+        stretchStage.viewport.apply()
+        stretchStage.draw()
+
+        stage.viewport.apply()
         stage.draw()
         stage.act(delta)
-
-        time += delta
-        if (time > GameSettings.FIRST_SPLASH_SCREEN_TIME) {
-            MainGame.screen = MenuScreen()
-        }
     }
 
     override fun resume() {
     }
 
     override fun dispose() {
+        stage.dispose()
+        stretchStage.dispose()
+    }
+
+    private inner class MainStretchStage : AbstractStretchStage {
+
+        constructor() {
+            addActor(BackgroundActor(AssetsManager.textureMap[Resources.RegionNames.BACKGROUND_NAME.name]))
+        }
     }
 }

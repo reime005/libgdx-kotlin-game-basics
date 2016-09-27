@@ -23,6 +23,8 @@ package de.reimerm.libgdxkotlinexample.utils
  */
 object Resources {
     val SPRITES_ATLAS_PATH = "sprites.atlas"
+    val SPLASH_IMAGE_PATH = "splash.png"
+    val BACKGROUND_MUSIC = "background.mp3"
 
     enum class RegionNames(val str: String) {
         BACKGROUND_NAME("background"),

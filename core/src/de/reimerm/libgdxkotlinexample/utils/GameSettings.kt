@@ -17,7 +17,6 @@
 package de.reimerm.libgdxkotlinexample.utils
 
 import com.badlogic.gdx.math.Vector2
-import de.reimerm.libgdxkotlinexample.enums.GameState
 
 /**
  * Singleton to manage game relevant settings.
@@ -25,7 +24,8 @@ import de.reimerm.libgdxkotlinexample.enums.GameState
  * Created by Marius Reimer on 10-Jun-16.
  */
 object GameSettings {
-    var gameState: GameState = GameState.PAUSED
+    val PREFERENCES_GENERAL = "general_prefs"
+    val MUSIC_PREFERENCES = "music"
     const val TIME_STEP: Float = 1 / 250f;
     const val HEIGHT = 480f
     const val WIDTH = 800f

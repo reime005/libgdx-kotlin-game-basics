@@ -18,23 +18,15 @@ package de.reimerm.libgdxkotlinexample.main
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.InputMultiplexer
-import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.input.GestureDetector
-import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.badlogic.gdx.physics.box2d.World
-import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.Array
-import com.badlogic.gdx.utils.Scaling
-import com.badlogic.gdx.utils.viewport.ScalingViewport
-import com.badlogic.gdx.utils.viewport.Viewport
+import de.reimerm.libgdxkotlinexample.abstract.AbstractStage
 import de.reimerm.libgdxkotlinexample.enums.GameState
 import de.reimerm.libgdxkotlinexample.listeners.Contacts
-import de.reimerm.libgdxkotlinexample.listeners.Gestures
 import de.reimerm.libgdxkotlinexample.menu.GameMenu
-import de.reimerm.libgdxkotlinexample.menu.MenuScreen
+import de.reimerm.libgdxkotlinexample.screens.MenuScreen
 import de.reimerm.libgdxkotlinexample.utils.BodyUtils
 import de.reimerm.libgdxkotlinexample.utils.GameManager
 import de.reimerm.libgdxkotlinexample.utils.GameSettings
@@ -45,69 +37,64 @@ import de.reimerm.libgdxkotlinexample.utils.WorldFactory
  *
  * Created by Marius Reimer on 10-Jun-16.
  */
-class MainStage : Stage {
+class MainStage : AbstractStage {
 
     private lateinit var world: World
-    private lateinit var screen: Rectangle
 
-    lateinit var menu: GameMenu
-        private set
-
-    private var renderer: Box2DDebugRenderer = Box2DDebugRenderer();
+    private var renderer: Box2DDebugRenderer = Box2DDebugRenderer()
 
     private var accumulator: Float = 0f
     private var time: Float = 0f
 
-    constructor() {
-        MainStage(ScalingViewport(Scaling.stretch, GameSettings.WIDTH, GameSettings.HEIGHT,
-                OrthographicCamera(GameSettings.WIDTH, GameSettings.HEIGHT)))
+    constructor() : super() {
+        clear()
         setupWorld()
+        GameManager.reset()
         setupMenu()
         createTouchControlAreas()
     }
 
-    constructor(viewport: Viewport) : super(viewport) {
+    /**
+     * On Game Restart (Reset all values)
+     */
+    fun onStart() {
+
     }
 
-    override fun draw() {
-        super.draw()
-        renderer.render(world, camera.combined)
-    }
+    /**
+     * Un-Comment this method to add the debug render
+     */
+    //    override fun draw() {
+//        super.draw()
+//        renderer.render(world, camera.combined)
+//    }
 
     private fun setupWorld() {
-        world = WorldFactory.createWorld()
-        world.setContactListener(Contacts())
-
-        Gestures.world = world
-        Gestures.camera = camera
+        GameManager.world = WorldFactory.createWorld()
+        GameManager.world.setContactListener(Contacts())
     }
 
     private fun setupMenu() {
-        menu = GameMenu()
+        val menu = GameMenu()
         addActor(menu.table)
+        GameManager.menu = menu
     }
 
     private fun createTouchControlAreas() {
-        screen = Rectangle(0f, 0f, camera.viewportWidth, camera.viewportHeight)
-
-        val multiplexer: InputMultiplexer = InputMultiplexer();
-        multiplexer.addProcessor(this)
-        multiplexer.addProcessor(GestureDetector(Gestures))
-        Gdx.input.inputProcessor = multiplexer
-
+        Gdx.input.inputProcessor = this
     }
 
     private fun update(body: Body) {
         // remove if body is out of world
         if (BodyUtils.bodyIsOutOfWorld(body)) {
-            GameManager.bodiesToRemove = GameManager.bodiesToRemove.plus(body)
+            GameManager.addBodyToRemove(body)
         }
     }
 
     override fun act(delta: Float) {
         super.act(delta)
 
-        if (!GameSettings.gameState.equals(GameState.RUNNING)) {
+        if (GameManager.gameState != GameState.RUNNING) {
             return
         }
 
@@ -118,20 +105,20 @@ class MainStage : Stage {
 
         for (b in GameManager.bodiesToRemove) {
             world.destroyBody(b)
-            GameManager.bodiesToRemove = GameManager.bodiesToRemove.minus(b)
+            GameManager.destroyBody(b)
         }
 
-        val bodies: Array<Body> = Array(world.bodyCount)
+        val bodies: Array<Body> = Array(GameManager.world.bodyCount)
         world.getBodies(bodies)
 
         for (b in bodies) {
             update(b)
         }
 
+        // increment a step in our game
         accumulator += delta
-
         while (accumulator >= delta) {
-            world.step(GameSettings.TIME_STEP, 6, 2)
+            GameManager.world.step(GameSettings.TIME_STEP, 6, 2)
             accumulator -= GameSettings.TIME_STEP
         }
     }
@@ -146,7 +133,6 @@ class MainStage : Stage {
     override fun dispose() {
         super.dispose()
         renderer.dispose()
-        menu.dispose()
         world.dispose()
     }
 }

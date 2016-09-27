@@ -16,7 +16,6 @@
 
 package de.reimerm.libgdxkotlinexample.menu
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
 import com.badlogic.gdx.scenes.scene2d.ui.Image
@@ -26,8 +25,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import com.badlogic.gdx.utils.Disposable
 import de.reimerm.libgdxkotlinexample.enums.GameState
 import de.reimerm.libgdxkotlinexample.main.MainGame
-import de.reimerm.libgdxkotlinexample.main.MainScreen
+import de.reimerm.libgdxkotlinexample.screens.MainScreen
+import de.reimerm.libgdxkotlinexample.screens.MenuScreen
 import de.reimerm.libgdxkotlinexample.utils.AssetsManager
+import de.reimerm.libgdxkotlinexample.utils.GameManager
 import de.reimerm.libgdxkotlinexample.utils.GameSettings
 import de.reimerm.libgdxkotlinexample.utils.Resources
 
@@ -46,7 +47,7 @@ class GameMenu : Disposable {
     constructor() {
         table = Table()
         table.setFillParent(true)
-        table.pad(Gdx.graphics.height.toFloat() * 0.025f)
+        table.pad(GameSettings.HEIGHT * 0.025f)
 
 //        table.debug()
 
@@ -69,18 +70,18 @@ class GameMenu : Disposable {
         pauseResumeButton = ImageButton(stylePauseResume)
         pauseResumeButton.addListener(object : InputListener() {
             override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
-                when (GameSettings.gameState) {
+                when (GameManager.gameState) {
                     GameState.OVER -> {
                         MainGame.screen = MainScreen()
                     }
 
                     GameState.RUNNING -> {
-                        GameSettings.gameState = GameState.PAUSED
+                        GameManager.gameState = GameState.PAUSED
                         onPause()
                     }
 
                     GameState.PAUSED -> {
-                        GameSettings.gameState = GameState.RUNNING
+                        GameManager.gameState = GameState.RUNNING
                         onResume()
                     }
                 }
@@ -89,8 +90,8 @@ class GameMenu : Disposable {
             }
         })
 
-        table.add(pauseResumeButton).top().left().size(Gdx.graphics.width * 0.08f, Gdx.graphics.width * 0.08f).expand()
-        table.add(menuButton).top().right().size(Gdx.graphics.width * 0.08f, Gdx.graphics.width * 0.08f)
+        table.add(pauseResumeButton).top().left().size(GameSettings.WIDTH * 0.08f, GameSettings.WIDTH * 0.08f).expand()
+        table.add(menuButton).top().right().size(GameSettings.WIDTH * 0.08f, GameSettings.WIDTH * 0.08f)
     }
 
     fun onPause() {

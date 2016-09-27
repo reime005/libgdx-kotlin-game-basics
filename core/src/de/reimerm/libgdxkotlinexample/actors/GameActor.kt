@@ -20,7 +20,7 @@ import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.scenes.scene2d.Actor
 import de.reimerm.libgdxkotlinexample.enums.GameState
 import de.reimerm.libgdxkotlinexample.userdata.UserData
-import de.reimerm.libgdxkotlinexample.utils.GameSettings
+import de.reimerm.libgdxkotlinexample.utils.GameManager
 
 /**
  * A basic class that you can derive from to create actors.
@@ -40,7 +40,7 @@ open class GameActor : Actor {
     override fun act(delta: Float) {
         super.act(delta)
 
-        if (!GameSettings.gameState.equals(GameState.RUNNING)) {
+        if (!GameManager.gameState.equals(GameState.RUNNING)) {
             return
         }
 

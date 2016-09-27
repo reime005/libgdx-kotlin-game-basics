@@ -17,6 +17,8 @@
 package de.reimerm.libgdxkotlinexample.utils
 
 import com.badlogic.gdx.assets.AssetManager
+import com.badlogic.gdx.audio.Music
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Disposable
@@ -38,13 +40,15 @@ object AssetsManager : Disposable {
     var textureMap: HashMap<String, TextureRegion> = HashMap()
         private set
 
-    var fullyLoaded: Boolean = false
-        get() = manager.isLoaded(de.reimerm.libgdxkotlinexample.utils.Resources.SPRITES_ATLAS_PATH)
-        private set
+    fun loadSplashAssets() {
+        manager.load(Resources.SPLASH_IMAGE_PATH, Texture::class.java)
+        manager.finishLoading()
+    }
 
     fun loadAssets() {
         manager = AssetManager()
-        manager.load(de.reimerm.libgdxkotlinexample.utils.Resources.SPRITES_ATLAS_PATH, TextureAtlas::class.java)
+        manager.load(Resources.BACKGROUND_MUSIC, Music::class.java)
+        manager.load(Resources.SPRITES_ATLAS_PATH, TextureAtlas::class.java)
     }
 
     fun loadAtlas() {

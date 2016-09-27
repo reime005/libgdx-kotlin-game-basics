@@ -17,6 +17,10 @@
 package de.reimerm.libgdxkotlinexample.utils
 
 import com.badlogic.gdx.physics.box2d.Body
+import com.badlogic.gdx.physics.box2d.World
+import com.badlogic.gdx.scenes.scene2d.Actor
+import de.reimerm.libgdxkotlinexample.enums.GameState
+import de.reimerm.libgdxkotlinexample.menu.GameMenu
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -26,6 +30,62 @@ import java.util.concurrent.ConcurrentHashMap
  * Created by Marius Reimer on 21-Jun-16.
  */
 object GameManager {
-    var bodiesToRemove: Set<Body> = Collections.newSetFromMap(ConcurrentHashMap<Body, Boolean>())
+    lateinit var bodiesToRemove: Set<Body>
+    lateinit var actorsToAdd: Set<Actor>
+
     var listener: GameEventListener? = null
+        @Synchronized get
+
+    lateinit var world: World
+        @Synchronized get
+
+    lateinit var gameState: GameState
+        @Synchronized get
+        @Synchronized set
+
+    var menu: GameMenu? = null
+
+    fun reset() {
+        gameState = GameState.RUNNING
+        bodiesToRemove = Collections.newSetFromMap(ConcurrentHashMap<Body, Boolean>())
+        actorsToAdd = Collections.newSetFromMap(ConcurrentHashMap<Actor, Boolean>())
+        menu = null
+    }
+
+    @Synchronized
+    fun addBodyToRemove(body: Body) {
+        bodiesToRemove = bodiesToRemove.plus(body)
+    }
+
+    @Synchronized
+    fun addActorToAdd(actor: Actor) {
+        actorsToAdd = actorsToAdd.plus(actor)
+    }
+
+    @Synchronized
+    fun onPause() {
+        if (gameState == GameState.RUNNING) {
+            gameState = GameState.PAUSED
+            AudioUtils.stopMusic()
+        }
+    }
+
+    @Synchronized
+    fun destroyBody(body: Body) {
+
+        // if, for some reason, the body is already destroyed
+        if (body.userData == null || body.fixtureList.size == 0) {
+            bodiesToRemove = bodiesToRemove.minus(body)
+            return
+        }
+
+        // for some reason there there was a non reproducible null pointer exception thrown
+        try {
+            world.destroyBody(body)
+        } catch (e: NullPointerException) {
+            e.printStackTrace()
+        }
+
+        bodiesToRemove = bodiesToRemove.minus(body)
+    }
 }

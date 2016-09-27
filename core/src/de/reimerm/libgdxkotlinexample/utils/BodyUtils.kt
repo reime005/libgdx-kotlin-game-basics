@@ -16,7 +16,6 @@
 
 package de.reimerm.libgdxkotlinexample.utils
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.physics.box2d.Body
 
 /**
@@ -27,6 +26,6 @@ import com.badlogic.gdx.physics.box2d.Body
 object BodyUtils {
 
     fun bodyIsOutOfWorld(body: Body): Boolean {
-        return ((body.position.x < 0 || body.position.y < 0 || body.position.x > Gdx.graphics.width || body.position.y > Gdx.graphics.height))
+        return ((body.position.x < 0 || body.position.y < 0 || body.position.x > GameSettings.WIDTH || body.position.y > GameSettings.HEIGHT))
     }
 }

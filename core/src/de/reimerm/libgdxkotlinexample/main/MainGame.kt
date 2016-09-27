@@ -18,6 +18,7 @@ package de.reimerm.libgdxkotlinexample.main
 
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.Screen
+import de.reimerm.libgdxkotlinexample.screens.SplashScreen
 import de.reimerm.libgdxkotlinexample.utils.AssetsManager
 
 /**
@@ -28,10 +29,8 @@ import de.reimerm.libgdxkotlinexample.utils.AssetsManager
 object MainGame : Game() {
 
     override fun create() {
-        AssetsManager.loadAssets()
-        AssetsManager.manager.finishLoading()
-        AssetsManager.loadAtlas()
-        setScreen(de.reimerm.libgdxkotlinexample.main.SplashScreen())
+        AssetsManager.loadSplashAssets()
+        setScreen(SplashScreen())
     }
 
     override fun setScreen(screen: Screen?) {
